@@ -1,0 +1,13 @@
+fastapi
+uvicorn[standard]
+yt-dlp
+openai-whisper
+ffmpeg-python
+static-ffmpeg
+rapidfuzz
+requests
+beautifulsoup4
+lyricsgenius
+aiofiles
+python-dotenv
+httpx

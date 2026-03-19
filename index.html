@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LyricFlow — Letras en tiempo real</title>
+    <meta name="description"
+        content="Explora letras sincronizadas en tiempo real con una experiencia visual tipo Apple Music. Busca tu canción favorita." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+    <!-- Background animated blobs -->
+    <div class="bg-blobs" aria-hidden="true">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-logo">
+            <span class="logo-icon">♪</span>
+            <span class="logo-text">LyricFlow</span>
+        </div>
+        <div class="header-actions">
+            <!-- Backend status pill -->
+            <div class="backend-status" id="backendStatus" title="Estado del servidor AI">
+                <span class="status-dot" id="statusDot"></span>
+                <span class="status-label" id="statusLabel">Verificando…</span>
+            </div>
+            <button class="btn-ghost" id="btnShare" title="Compartir">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="18" cy="5" r="3" />
+                    <circle cx="6" cy="12" r="3" />
+                    <circle cx="18" cy="19" r="3" />
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                </svg>
+                Compartir
+            </button>
+            <button class="btn-ghost" id="btnExport" title="Exportar">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                Exportar
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- Search Section -->
+        <section class="search-section" id="searchSection">
+            <div class="search-hero">
+                <h1 class="search-title">Letras sincronizadas<br /><span class="accent">en tiempo real</span></h1>
+                <p class="search-subtitle">Ingresa el nombre de una canción o un enlace de YouTube</p>
+            </div>
+
+            <div class="search-container">
+                <div class="search-input-wrapper" id="searchWrapper">
+                    <div class="search-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="11" cy="11" r="8" />
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                        </svg>
+                    </div>
+                    <input type="text" id="searchInput" class="search-input"
+                        placeholder="Ej: Blinding Lights - The Weeknd  o  youtube.com/watch?v=..." autocomplete="off" />
+                    <button class="search-btn" id="searchBtn">
+                        <span id="searchBtnText">Buscar</span>
+                        <div class="spinner hidden" id="searchSpinner"></div>
+                    </button>
+                </div>
+                <div class="search-suggestions" id="searchSuggestions"></div>
+            </div>
+
+            <!-- Demo songs -->
+            <div class="demo-tags">
+                <span class="demo-label">Prueba con:</span>
+                <button class="tag" data-song="Blinding Lights" data-artist="The Weeknd">Blinding Lights</button>
+                <button class="tag" data-song="Shape of You" data-artist="Ed Sheeran">Shape of You</button>
+                <button class="tag" data-song="Stay" data-artist="The Kid LAROI">Stay</button>
+                <button class="tag" data-song="Levitating" data-artist="Dua Lipa">Levitating</button>
+                <button class="tag" data-song="Peaches" data-artist="Justin Bieber">Peaches</button>
+            </div>
+        </section>
+
+        <!-- Player Section (hidden initially) -->
+        <section class="player-section hidden" id="playerSection">
+
+            <!-- Player Card -->
+            <div class="player-card">
+                <!-- Album Art -->
+                <div class="album-art-wrapper">
+                    <div class="album-glow" id="albumGlow"></div>
+                    <img class="album-art" id="albumArt" src="" alt="Portada del álbum" />
+                    <div class="album-overlay">
+                        <span class="now-playing-badge">▶ En reproducción</span>
+                    </div>
+                </div>
+
+                <!-- Song Info -->
+                <div class="song-info">
+                    <h2 class="song-title" id="songTitle">—</h2>
+                    <p class="song-artist" id="songArtist">—</p>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="progress-container">
+                    <span class="time-label" id="timeElapsed">0:00</span>
+                    <div class="progress-bar-track" id="progressTrack">
+                        <div class="progress-bar-fill" id="progressFill"></div>
+                        <div class="progress-thumb" id="progressThumb"></div>
+                    </div>
+                    <span class="time-label" id="timeDuration">0:00</span>
+                </div>
+
+                <!-- Controls -->
+                <div class="controls">
+                    <button class="ctrl-btn" id="btnPrev" title="Anterior">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M6 6h2v12H6zm3.5 6 8.5 6V6z" />
+                        </svg>
+                    </button>
+                    <button class="ctrl-btn ctrl-play" id="btnPlay" title="Reproducir/Pausa">
+                        <svg class="icon-play" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M8 5v14l11-7z" />
+                        </svg>
+                        <svg class="icon-pause hidden" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                        </svg>
+                    </button>
+                    <button class="ctrl-btn" id="btnNext" title="Siguiente">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- HTML5 Audio player (hidden) -->
+                <audio id="audioPlayer" crossorigin="anonymous" preload="none"></audio>
+
+                <!-- YouTube embed (hidden utility) -->
+                <div id="ytPlayerContainer" class="yt-hidden">
+                    <div id="ytPlayer"></div>
+                </div>
+
+                <!-- Volume control -->
+                <div class="volume-row">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" class="vol-icon">
+                        <path
+                            d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z" />
+                    </svg>
+                    <input type="range" id="volumeSlider" class="volume-slider" min="0" max="100" value="80" />
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" class="vol-icon">
+                        <path
+                            d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
+                    </svg>
+                </div>
+
+                <!-- Source badge -->
+                <div class="source-badge" id="sourceBadge"></div>
+            </div>
+
+            <!-- Lyrics Panel -->
+            <div class="lyrics-panel" id="lyricsPanel">
+                <div class="lyrics-header">
+                    <span class="lyrics-badge">Letras</span>
+                    <button class="btn-ghost-sm" id="btnSearchAgain">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="11" cy="11" r="8" />
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                        </svg>
+                        Nueva búsqueda
+                    </button>
+                </div>
+                <div class="lyrics-scroll-container" id="lyricsContainer">
+                    <div class="lyrics-content" id="lyricsContent">
+                        <!-- Lines injected by JS -->
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Toast notification -->
+    <div class="toast hidden" id="toast"></div>
+
+    <!-- Share Modal -->
+    <div class="modal-overlay hidden" id="modalOverlay">
+        <div class="modal" id="shareModal">
+            <div class="modal-header">
+                <h3>Compartir LyricFlow</h3>
+                <button class="modal-close" id="modalClose">✕</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-desc">Comparte esta experiencia de letras sincronizadas</p>
+                <div class="share-url-box">
+                    <input type="text" id="shareUrlInput" class="share-url-input" readonly />
+                    <button class="btn-accent" id="btnCopyUrl">Copiar</button>
+                </div>
+                <div class="share-platforms">
+                    <button class="platform-btn tiktok" id="btnTikTok">
+                        <span class="platform-icon">♪</span> TikTok
+                    </button>
+                    <button class="platform-btn twitter" id="btnTwitter">
+                        <span class="platform-icon">𝕏</span> Twitter
+                    </button>
+                    <button class="platform-btn whatsapp" id="btnWhatsApp">
+                        <span class="platform-icon">●</span> WhatsApp
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div class="modal-overlay hidden" id="exportOverlay">
+        <div class="modal" id="exportModal">
+            <div class="modal-header">
+                <h3>Exportar letras</h3>
+                <button class="modal-close" id="exportClose">✕</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-desc">Elige el formato de exportación</p>
+                <div class="export-options">
+                    <button class="export-opt" id="exportTxt">
+                        <span class="export-icon">📄</span>
+                        <span class="export-label">Texto plano</span>
+                        <span class="export-sub">.txt</span>
+                    </button>
+                    <button class="export-opt" id="exportLRC">
+                        <span class="export-icon">🎵</span>
+                        <span class="export-label">Sincronizado</span>
+                        <span class="export-sub">.lrc</span>
+                    </button>
+                    <button class="export-opt" id="exportPng">
+                        <span class="export-icon">🖼️</span>
+                        <span class="export-label">Captura</span>
+                        <span class="export-sub">.png</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Processing Modal (AI Pipeline) -->
+    <div class="modal-overlay hidden" id="processingOverlay">
+        <div class="processing-modal" id="processingModal">
+            <div class="processing-header">
+                <div class="processing-icon">🧠</div>
+                <h3 class="processing-title">Procesando con IA</h3>
+                <p class="processing-subtitle" id="processingSubtitle">Preparando pipeline…</p>
+            </div>
+            <div class="processing-steps">
+                <div class="proc-step" id="stepDownload">
+                    <div class="step-icon-wrap">
+                        <span class="step-emoji">⬇️</span>
+                        <div class="step-ring"></div>
+                    </div>
+                    <div class="step-info">
+                        <span class="step-name">Descargando audio</span>
+                        <span class="step-detail">yt-dlp · ffmpeg</span>
+                    </div>
+                    <div class="step-check hidden">✓</div>
+                </div>
+                <div class="proc-step" id="stepTranscribe">
+                    <div class="step-icon-wrap">
+                        <span class="step-emoji">🎙️</span>
+                        <div class="step-ring"></div>
+                    </div>
+                    <div class="step-info">
+                        <span class="step-name">Transcribiendo</span>
+                        <span class="step-detail">Whisper AI</span>
+                    </div>
+                    <div class="step-check hidden">✓</div>
+                </div>
+                <div class="proc-step" id="stepSync">
+                    <div class="step-icon-wrap">
+                        <span class="step-emoji">🔗</span>
+                        <div class="step-ring"></div>
+                    </div>
+                    <div class="step-info">
+                        <span class="step-name">Sincronizando letras</span>
+                        <span class="step-detail">rapidfuzz</span>
+                    </div>
+                    <div class="step-check hidden">✓</div>
+                </div>
+            </div>
+            <div class="processing-progress">
+                <div class="proc-progress-bar">
+                    <div class="proc-progress-fill" id="procProgressFill"></div>
+                </div>
+                <span class="proc-progress-pct" id="procProgressPct">0%</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
