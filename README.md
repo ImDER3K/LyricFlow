@@ -1,4 +1,4 @@
-<img width="280" height="380" alt="image" src="https://github.com/user-attachments/assets/48a64563-27b7-4435-b6c2-b190593d7c98" />
+<img width="380" height="280" alt="image" src="https://github.com/user-attachments/assets/48a64563-27b7-4435-b6c2-b190593d7c98" />
 
 
 # 🎵 LyricFlow
